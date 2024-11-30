@@ -45,10 +45,15 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <csignal>
+#include <errno.h>
 
 #include "DeckLinkAPI.h"
 #include "Capture.h"
 #include "Config.h"
+
+#include <sys/mman.h>
+#include <sys/shm.h>
+#include <sys/stat.h>
 
 static pthread_mutex_t g_sleepMutex;
 static pthread_cond_t g_sleepCond;
@@ -61,6 +66,9 @@ static BMDConfig g_config;
 static IDeckLinkInput *g_deckLinkInput = NULL;
 
 static unsigned long g_frameCount = 0;
+
+static void *ptr = NULL;
+static const int FRAME_SIZE = 829440;
 
 DeckLinkCaptureDelegate::DeckLinkCaptureDelegate() : m_refCount(1),
 													 m_pixelFormat(g_config.m_pixelFormat)
@@ -110,10 +118,6 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
 		}
 		else
 		{
-			// TODO: The frame is arrived succesfully. Send it to shared memory.
-
-
-
 			const char *timecodeString = NULL;
 			if (g_config.m_timecodeFormat != 0)
 			{
@@ -123,7 +127,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
 					timecode->GetString(&timecodeString);
 				}
 			}
-			
+
 			printf("Frame received (#%lu) [%s] - %s - Size: %li bytes\n",
 				   g_frameCount,
 				   timecodeString != NULL ? timecodeString : "No timecode",
@@ -133,11 +137,16 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
 			if (timecodeString)
 				free((void *)timecodeString);
 
-			//Writes video frame to file
+			// Writes video frame to file
 			if (g_videoOutputFile != -1)
 			{
+				// TODO: The frame is arrived succesfully. Use shared memory. 829440 bytes for each PALp50 frame
+
 				videoFrame->GetBytes(&frameBytes);
 				write(g_videoOutputFile, frameBytes, videoFrame->GetRowBytes() * videoFrame->GetHeight());
+
+				// Copy the frambytes to shared memory pointer bytes.
+				memcpy(ptr, frameBytes, FRAME_SIZE);
 
 				if (rightEyeFrame)
 				{
@@ -344,6 +353,29 @@ int main(int argc, char *argv[])
 
 	// Print the selected configuration
 	g_config.DisplayConfiguration();
+
+	// TODO: Define memory sharing for single frame (829440 bytes)
+	static int shm_fd = shm_open("shared_frame_1", O_CREAT | O_RDWR, 0666);
+
+	if (shm_fd < 0)
+	{
+		perror("Failed to create shared memory");
+		goto bail;
+	}
+	else
+	{
+		// Configure shared memory size
+		//TODO: add ftruncate perror
+		ftruncate(shm_fd, FRAME_SIZE);
+		// Memory map shared memory object
+		ptr = mmap(NULL, FRAME_SIZE, PROT_WRITE, MAP_SHARED, shm_fd, 0);
+	}
+	if (ptr == MAP_FAILED)
+	{
+		perror("Failed to map shared memory block");
+		shm_unlink("shared_frame_1");
+		goto bail;
+	}
 
 	// Configure the capture callback
 	delegate = new DeckLinkCaptureDelegate();
