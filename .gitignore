@@ -4,3 +4,4 @@ capture
 #processing
 __pycache__
 .qtcreator
+processing/ui_form.py
