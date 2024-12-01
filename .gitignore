@@ -2,3 +2,5 @@
 build
 capture
 #processing
+__pycache__
+.qtcreator
