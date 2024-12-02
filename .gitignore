@@ -3,8 +3,9 @@ capture/build
 capture/Capture
 testcapture.raw
 #processing
-processing/__pycache__
-processing/.qtcreator
-processing/ui_form.py
-processing/.ropeproject
+__pycache__
+.qtcreator
+ui_form.py
+.ropeproject
 *.pyproject
+*.user
