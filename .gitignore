@@ -1,10 +1,11 @@
 #capture
-build
-capture
+capture/build
+capture/Capture
+capture/testcapture.raw
 #processing
-__pycache__
-.qtcreator
+processing/__pycache__
+processing/.qtcreator
 processing/ui_form.py
-.ropeproject
+processing/.ropeproject
 processing/processing.pyproject
 processing/processing.pyproject.user
