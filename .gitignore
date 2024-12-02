@@ -5,3 +5,6 @@ capture
 __pycache__
 .qtcreator
 processing/ui_form.py
+.ropeproject
+processing/processing.pyproject
+processing/processing.pyproject.user
