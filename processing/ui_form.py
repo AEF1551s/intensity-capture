@@ -15,35 +15,42 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QMainWindow,
-    QMenuBar, QSizePolicy, QStatusBar, QWidget)
+from PySide6.QtWidgets import (QApplication, QGridLayout, QGroupBox, QHBoxLayout,
+    QMainWindow, QMenuBar, QSizePolicy, QStatusBar,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(790, 480)
-        MainWindow.setMinimumSize(QSize(790, 480))
-        MainWindow.setMaximumSize(QSize(790, 480))
+        MainWindow.resize(770, 687)
+        MainWindow.setMinimumSize(QSize(0, 0))
+        MainWindow.setMaximumSize(QSize(1280, 720))
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
+        self.gridLayout = QGridLayout(self.centralwidget)
+        self.gridLayout.setObjectName(u"gridLayout")
         self.previewGroupBox = QGroupBox(self.centralwidget)
         self.previewGroupBox.setObjectName(u"previewGroupBox")
-        self.previewGroupBox.setGeometry(QRect(20, 10, 750, 424))
-        self.previewGroupBox.setMinimumSize(QSize(663, 424))
+        self.previewGroupBox.setMinimumSize(QSize(740, 620))
+        self.previewGroupBox.setMaximumSize(QSize(740, 620))
         self.horizontalLayout = QHBoxLayout(self.previewGroupBox)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.previewContainer = QWidget(self.previewGroupBox)
         self.previewContainer.setObjectName(u"previewContainer")
-        self.previewContainer.setMinimumSize(QSize(640, 360))
+        self.previewContainer.setMinimumSize(QSize(720, 576))
+        self.previewContainer.setMaximumSize(QSize(720, 576))
         self.previewContainer.setAutoFillBackground(False)
 
         self.horizontalLayout.addWidget(self.previewContainer)
 
+
+        self.gridLayout.addWidget(self.previewGroupBox, 0, 0, 1, 1)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 790, 23))
+        self.menubar.setGeometry(QRect(0, 0, 770, 23))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
